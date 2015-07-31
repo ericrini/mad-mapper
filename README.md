@@ -4,7 +4,8 @@ The best way to map one JSON structure into another.
 # Example Usage
 
 First you need some source data.
-```
+
+```javascript
 var source = {
 	"EIN": "123456789",
 	"SOCIAL_SECURITY_NUMBER": "371-06-0355",
@@ -98,12 +99,14 @@ var instructions = {
 ```
 
 You can get the result easily by passing the source and instructions.
-```
+
+```javascript
 var MadMapper = require('mad-mapper');
 var result = new MadMapper().mapObject(source, instructions);
 ```
 
 The transformed result.
+
 ```javascript
 {
     "employerName": "Some Company",
