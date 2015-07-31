@@ -1,0 +1,15 @@
+{
+  "name": "MadMapper",
+  "version": "1.0.0",
+  "description": "Map any structure to any other structure using only metadata.",
+  "main": "map.js",
+  "scripts": {
+    "test": "node ./test.js"
+  },
+  "author": "Eric Rini",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^3.10.0",
+    "lodash-deep": "^1.6.0"
+  }
+}
