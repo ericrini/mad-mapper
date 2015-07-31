@@ -1,5 +1,5 @@
 var moment = require('moment');
-var mapper = require('./index');
+var MadMapper = require('./index');
 
 var source = {
 	"EIN": "123456789",
@@ -10,7 +10,8 @@ var source = {
 	"ADDRESS": {
 		"LINE1": "1234 Fake Street",
 		"CITY": "Somewhere",
-		"STATE": "AA"
+		"STATE": "AA",
+		"ZIP": "12345"
 	},
 	"CONTRACT_NUMBER": "12345",
 	"BALANCE": "100000",
@@ -33,9 +34,7 @@ var source = {
 
 var instructions = {
 	employerIdentificationNumber: {
-		strategy: function (source) {
-			return source.EIN
-		}
+		property: 'EIN'
 	},
 	participants: {
 		strategy: function (source, mapObject, mapArray) {
@@ -50,31 +49,31 @@ var instructions = {
 						return moment(source.DATE_OF_BIRTH, 'MM/DD/YYYY').format('YYYY-MM-DD');
 					}
 				},
+				address: {
+					strategy: function (source) {
+						return source.ADDRESS.LINE1 + source.ADDRESS.CITY + ', ' + source.ADDRESS.STATE + ' ' + source.ADDRESS.ZIP;
+					}
+				},
 				accounts: {
 					"strategy": function (source, mapObject, mapArray) {
 						return mapArray([source], {
+							constractNumber: {
+								property: 'CONTRACT_NUMBER'
+							},
 							preTaxAccountBalance: {
-								strategy: function (source) {
-									return source.BALANCE;
-								}
+								property: 'BALANCE'
 							},
 							preTaxContributionPercent: {
-								strategy: function (source) {
-									return source.RATE;
-								}
+								property: 'RATE'
 							},
 							allocations: {
 								strategy: function (source, mapObject, mapArray) {
 									return mapArray(source.ALLOCATIONS, {
 										tickerSymbol: {
-											strategy: function (source) {
-												return source.TICKER
-											}
+											property: 'TICKER'
 										},
 										percentAllocation: {
-											strategy: function (source) {
-												return source.ALLOCATION
-											}
+											property: 'ALLOCATION'
 										}
 									});
 								}
@@ -87,6 +86,7 @@ var instructions = {
 	}
 };
 
-var result = mapper.mapObject(source, instructions);
+var madmapper = new MadMapper();
+var result = madmapper.mapObject(source, instructions);
 
 console.log(JSON.stringify(result, null, 4));

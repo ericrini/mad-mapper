@@ -1,20 +1,39 @@
-var lodash = require('lodash');
+var lodash = require('./lib/lodash');
 
-function mapArray(source, instructions) {
+var MadMapper = function () {
+	this.test = 1;
+};
+
+MadMapper.prototype.mapArray = function (source, instructions) {
+	var self = this;
+
 	return lodash.reduce(source, function (destination, value) {
-		destination.push(mapObject(value, instructions));
+		destination.push(self.mapObject(value, instructions));
 		return destination;
 	}, []);
-}
+};
 
-function mapObject(source, instructions) {
+MadMapper.prototype.mapObject = function (source, instructions) {
+	var self = this;
+
 	return lodash.reduce(instructions, function(destination, instruction, key) {
-		destination[key] = instruction.strategy(source, mapObject, mapArray);
+		if (instruction.property) {
+			destination[key] = source[instruction.property];
+		}
+
+		if (instruction.strategy) {
+			destination[key] = instruction.strategy(
+				source,
+				function () {
+					return self.mapObject.apply(self, arguments);
+				}, 
+				function () {
+					return self.mapArray.apply(self, arguments);
+				});
+		}
+
 		return destination;
 	}, {});
-}
-
-module.exports = {
-	mapArray: mapArray,
-	mapObject: mapObject
 };
+
+module.exports = MadMapper;
