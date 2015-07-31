@@ -17,19 +17,17 @@ MadMapper.prototype.mapObject = function (source, instructions) {
 	var self = this;
 
 	return lodash.reduce(instructions, function(destination, instruction, key) {
-		if (instruction.property) {
-			destination[key] = source[instruction.property];
+		if (typeof instruction === 'string') {
+			destination[key] = source[instruction];
 		}
 
-		if (instruction.strategy) {
-			destination[key] = instruction.strategy(
+		if (typeof instruction === 'function') {
+			destination[key] = instruction.call(
+				self,
 				source,
-				function () {
-					return self.mapObject.apply(self, arguments);
-				}, 
-				function () {
-					return self.mapArray.apply(self, arguments);
-				});
+				function () { return self.mapObject.apply(self, arguments); },
+				function () { return self.mapArray.apply(self, arguments); }
+			);
 		}
 
 		return destination;

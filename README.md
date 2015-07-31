@@ -38,62 +38,61 @@ var source = {
 
 Then you need some instructions to transform it.
 
-```
+```javascript
 var instructions = {
-	employerIdentificationNumber: {
-		property: 'EIN'	// A shortcut for a direct map to a source property.
+
+	// The most basic mapping strategy maps a destination property to a source property by it's name.
+	employerName: 'EMPLOYER_NAME',
+
+	// Sometimes you need to change data types or do other logic on source data to get the destination value. This adds
+	// proper formatting to the employer identification number.
+	employerIdentificationNumber: function (source) {
+		return source.EIN.slice(0, -2) + '-' + source.EIN.slice(-2);
 	},
-	participants: {
-		strategy: function (source, mapObject, mapArray) {
-			return mapArray([source], {
-				socialSecurityNumber: {
-					strategy: function (source) {
-						return source.SOCIAL_SECURITY_NUMBER.replace('-', '').replace('-', '');
-					}
-				},
-				dateOfBirth: {
 
-					// A strategy can be used to transform source properties.
-					strategy: function (source) {
-						return moment(source.DATE_OF_BIRTH, 'MM/DD/YYYY').format('YYYY-MM-DD');
-					}
-				},
-				address: {
+	employerDetails: function (source, mapObject) {
 
-					// A strategy can access more than one source property at a time.
-					strategy: function (source) {
-						return source.ADDRESS.LINE1 + source.ADDRESS.CITY + ', ' + source.ADDRESS.STATE + ' ' + source.ADDRESS.ZIP;
-					}
-				},
-				accounts: {
-					"strategy": function (source, mapObject, mapArray) {
-						return mapArray([source], {
-							constractNumber: {
-								property: 'CONTRACT_NUMBER'
-							},
-							preTaxAccountBalance: {
-								property: 'BALANCE'
-							},
-							preTaxContributionPercent: {
-								property: 'RATE'
-							},
-							allocations: {
-								strategy: function (source, mapObject, mapArray) {
-									return mapArray(source.ALLOCATIONS, {
-										tickerSymbol: {
-											property: 'TICKER'
-										},
-										percentAllocation: {
-											property: 'ALLOCATION'
-										}
-									});
-								}
-							}
+		// The mapObject strategy callback can create a new level in the destination document tree. This can be passed any
+		// sub-tree of the source document and a set of instructions that continues to follow the rules that have already
+		// been established.
+		return mapObject(source, {
+			address: function (source) {
+
+				// Note how a strategy can access multiple fields from the source to construct a new destination property.
+				return source.EMPLOYER_ADDRESS.LINE1 +
+					source.EMPLOYER_ADDRESS.CITY + ', ' +
+					source.EMPLOYER_ADDRESS.STATE + ' ' +
+					source.EMPLOYER_ADDRESS.ZIP;
+			},
+			website: 'EMPLOYER_WEBSITE'
+		});
+	},
+
+	// Let's get crazy.
+	participants: function (source, mapObject, mapArray) {
+
+		// The mapArray function allows you to create an array in the destination document. It always takes an array as
+		// input and the instructions are applied to each item.
+		//
+		// In this case were passing the whole source document. So the destination array will only have one item in it.
+		return mapArray([source], {
+			socialSecurityNumber: 'SOCIAL_SECURITY_NUMBER',
+			accounts: function (source, mapObject, mapArray) {
+				return mapArray([source], {
+					constractNumber: 'CONTRACT_NUMBER',
+					preTaxAccountBalance: 'BALANCE',
+					preTaxContributionPercent: 'RATE',
+					allocations: function (source, mapObject, mapArray) {
+
+						// Here we are mapping an array on the source into a whole new array. So this array has many items.
+						return mapArray(source.ALLOCATIONS, {
+							tickerSymbol: 'TICKER',
+							percentAllocation: 'ALLOCATION'
 						});
 					}
-				}
-			})
-		}
+				});
+			}
+		})
 	}
 };
 ```
@@ -105,15 +104,20 @@ var result = new MadMapper().mapObject(source, instructions);
 ```
 
 The transformed result.
-```
+```javascript
 {
-    "employerIdentificationNumber": "123456789",
+    "employerName": "Some Company",
+    "employerIdentificationNumber": "1234567-89",
+    "employerDetails": {
+        "address": "1234 Fake StreetSomewhere, AA 12345",
+        "website": "http://some-website.com"
+    },
     "participants": [
         {
             "socialSecurityNumber": "371-06-0355",
-            "dateOfBirth": "1985-10-23",
             "accounts": [
                 {
+                    "constractNumber": "12345",
                     "preTaxAccountBalance": "100000",
                     "preTaxContributionPercent": "6",
                     "allocations": [
