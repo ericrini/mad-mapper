@@ -2,9 +2,9 @@
   "name": "mad-mapper",
   "version": "2.0.1",
   "description": "Map any structure to any other structure using transform metadata.",
-  "main": "map.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo 'Try running test1.js and test2.js.'"
+    "test": "gulp istanbul"
   },
   "author": "Eric Rini",
   "license": "MIT",
@@ -12,7 +12,13 @@
     "type": "git",
     "url": "https://github.com/ericrini/mad-mapper"
   },
+  "dependencies": {
+    "lodash": "3.10.0",
+    "moment": "^2.10.6"
+  },
   "devDependencies": {
-    "mad-mapper": "2.0.1"
+    "gulp": "^3.9.0",
+    "gulp-istanbul": "0.10.0",
+    "gulp-jasmine": "2.0.1"
   }
 }
