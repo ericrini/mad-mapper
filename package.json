@@ -1,6 +1,6 @@
 {
   "name": "mad-mapper",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Map any structure to any other structure using transform metadata.",
   "main": "map.js",
   "scripts": {
