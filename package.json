@@ -1,10 +1,10 @@
 {
   "name": "mad-mapper",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Map any structure to any other structure using transform metadata.",
   "main": "map.js",
   "scripts": {
-    "test": "node ./test.js"
+    "test": "echo 'Try running test1.js and test2.js.'"
   },
   "author": "Eric Rini",
   "license": "MIT",

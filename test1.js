@@ -46,12 +46,12 @@ var instructions = {
 		return source.EIN.slice(0, -2) + '-' + source.EIN.slice(-2);
 	},
 
-	employerDetails: function (source, mapObject) {
+	employerDetails: function (source, object) {
 
-		// The mapObject strategy callback can create a new level in the destination document tree. This can be passed any
+		// The object strategy callback can create a new level in the destination document tree. This can be passed any
 		// sub-tree of the source document and a set of instructions that continues to follow the rules that have already
 		// been established.
-		return mapObject(source, {
+		return object(source, {
 			address: function (source) {
 
 				// Note how a strategy can access multiple fields from the source to construct a new destination property.
@@ -64,24 +64,24 @@ var instructions = {
 		});
 	},
 
-	// Let's get crazy.
-	participants: function (source, mapObject, mapArray) {
+	// Let's go crazy.
+	participants: function (source, object, array) {
 
-		// The mapArray function allows you to create an array in the destination document. It always takes an array as
+		// The array function allows you to create an array in the destination document. It always takes an array as
 		// input and the instructions are applied to each item.
 		//
 		// In this case were passing the whole source document. So the destination array will only have one item in it.
-		return mapArray([source], {
+		return array([source], {
 			socialSecurityNumber: 'SOCIAL_SECURITY_NUMBER',
-			accounts: function (source, mapObject, mapArray) {
-				return mapArray([source], {
+			accounts: function (source, object, array) {
+				return array([source], {
 					constractNumber: 'CONTRACT_NUMBER',
 					preTaxAccountBalance: 'BALANCE',
 					preTaxContributionPercent: 'RATE',
-					allocations: function (source, mapObject, mapArray) {
+					allocations: function (source, object, array) {
 
 						// Here we are mapping an array on the source into a whole new array. So this array has many items.
-						return mapArray(source.ALLOCATIONS, {
+						return array(source.ALLOCATIONS, {
 							tickerSymbol: 'TICKER',
 							percentAllocation: 'ALLOCATION'
 						});
@@ -93,7 +93,7 @@ var instructions = {
 };
 
 var madmapper = new MadMapper();
-var result = madmapper.mapObject(source, instructions);
+var result = madmapper.object(source, instructions);
 
 console.log(JSON.stringify(result, null, 4));
 
