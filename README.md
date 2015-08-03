@@ -47,46 +47,46 @@ var instructions = {
 
 	// Sometimes you need to change data types or do other logic on source data to get the destination value. This adds
 	// proper formatting to the employer identification number.
-	employerIdentificationNumber: function (source) {
-		return source.EIN.slice(0, -2) + '-' + source.EIN.slice(-2);
+	employerIdentificationNumber: function (current) {
+		return current.EIN.slice(0, -2) + '-' + current.EIN.slice(-2);
 	},
 
-	employerDetails: function (source, mapObject) {
+	employerDetails: function (current, object) {
 
-		// The mapObject strategy callback can create a new level in the destination document tree. This can be passed any
+		// The object strategy callback can create a new level in the destination document tree. This can be passed any
 		// sub-tree of the source document and a set of instructions that continues to follow the rules that have already
 		// been established.
-		return mapObject(source, {
-			address: function (source) {
+		return object(current, {
+			address: function (current) {
 
 				// Note how a strategy can access multiple fields from the source to construct a new destination property.
-				return source.EMPLOYER_ADDRESS.LINE1 +
-					source.EMPLOYER_ADDRESS.CITY + ', ' +
-					source.EMPLOYER_ADDRESS.STATE + ' ' +
-					source.EMPLOYER_ADDRESS.ZIP;
+				return current.EMPLOYER_ADDRESS.LINE1 +
+					current.EMPLOYER_ADDRESS.CITY + ', ' +
+					current.EMPLOYER_ADDRESS.STATE + ' ' +
+					current.EMPLOYER_ADDRESS.ZIP;
 			},
 			website: 'EMPLOYER_WEBSITE'
 		});
 	},
 
-	// Let's get crazy.
-	participants: function (source, mapObject, mapArray) {
+	// Let's go crazy.
+	participants: function (current, object, array) {
 
-		// The mapArray function allows you to create an array in the destination document. It always takes an array as
+		// The array function allows you to create an array in the destination document. It always takes an array as
 		// input and the instructions are applied to each item.
 		//
 		// In this case were passing the whole source document. So the destination array will only have one item in it.
-		return mapArray([source], {
+		return array([current], {
 			socialSecurityNumber: 'SOCIAL_SECURITY_NUMBER',
-			accounts: function (source, mapObject, mapArray) {
-				return mapArray([source], {
+			accounts: function (current, object, array) {
+				return array([current], {
 					constractNumber: 'CONTRACT_NUMBER',
 					preTaxAccountBalance: 'BALANCE',
 					preTaxContributionPercent: 'RATE',
-					allocations: function (source, mapObject, mapArray) {
+					allocations: function (current, object, array) {
 
 						// Here we are mapping an array on the source into a whole new array. So this array has many items.
-						return mapArray(source.ALLOCATIONS, {
+						return array(current.ALLOCATIONS, {
 							tickerSymbol: 'TICKER',
 							percentAllocation: 'ALLOCATION'
 						});
@@ -102,7 +102,7 @@ You can get the result easily by passing the source and instructions.
 
 ```javascript
 var MadMapper = require('mad-mapper');
-var result = new MadMapper().mapObject(source, instructions);
+var result = new MadMapper().object(source, instructions);
 ```
 
 The transformed result.

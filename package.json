@@ -13,6 +13,6 @@
     "url": "https://github.com/ericrini/mad-mapper"
   },
   "devDependencies": {
-    "moment": "^2.10.6"
+    "mad-mapper": "2.0.1"
   }
 }
