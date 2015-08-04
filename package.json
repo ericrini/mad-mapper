@@ -1,6 +1,6 @@
 {
   "name": "mad-mapper",
-  "version": "2.0.1",
+  "version": "2.1.1",
   "description": "Map any structure to any other structure using transform metadata.",
   "main": "main.js",
   "scripts": {
@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "lodash": "3.10.0",
-    "moment": "^2.10.6"
+    "moment": "2.10.6"
   },
   "devDependencies": {
-    "gulp": "^3.9.0",
+    "gulp": "3.9.0",
     "gulp-istanbul": "0.10.0",
     "gulp-jasmine": "2.0.1"
   }
